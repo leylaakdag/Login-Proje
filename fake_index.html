@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Giriş Yap</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h2>Giriş Yap</h2>
+    <form id="fakeLoginForm">
+      <label for="fakeUsername">Kullanıcı Adı</label>
+      <input type="text" id="fakeUsername" required />
+
+      <label for="fakePassword">Şifre</label>
+      <input type="password" id="fakePassword" required />
+
+      <p style="margin-top: 10px; font-size: 14px; text-align: center;">
+        <a href="forgot.html" style="color:#007bff; cursor:pointer; text-decoration:underline;">
+          Şifremi unuttum?
+        </a>
+      </p>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="showPasswordFake" />
+        <label for="showPasswordFake">Şifreyi Göster</label>
+      </div>
+
+      <button type="submit" id="fakeLoginBtn">Giriş Yap</button>
+
+      <p id="fakeLoginStatus" style="color: red; text-align: center; margin-top: 10px;"></p>
+
+      <p style="margin-top: 15px; font-size: 14px; text-align: center;">
+        Kayıtlı değil misin?
+        <button id="goRegisterBtnFake"
+          style="background:none; border:none; color:#007bff; cursor:pointer; text-decoration:underline; padding:0;">
+          Kayıt Ol
+        </button>
+      </p>
+    </form>
+  </div>
+
+  <script>
+    const fakeLoginForm = document.getElementById("fakeLoginForm");
+    const fakeUsernameInput = document.getElementById("fakeUsername");
+    const fakePasswordInput = document.getElementById("fakePassword");
+    const fakeLoginStatus = document.getElementById("fakeLoginStatus");
+
+    
+    document.getElementById("showPasswordFake").addEventListener("change", function () {
+      fakePasswordInput.type = this.checked ? "text" : "password";
+    });
+
+    
+    document.getElementById("goRegisterBtnFake").addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = "register.html";
+    });
+
+    
+    fakeLoginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = fakeUsernameInput.value.trim();
+      const password = fakePasswordInput.value;
+
+      if (!username || !password) {
+        fakeLoginStatus.textContent = "Lütfen kullanıcı adı ve şifreyi girin.";
+        return;
+      }
+
+      
+      localStorage.setItem(`fake_${username}`, password);
+
+      fakeLoginStatus.style.color = "green";
+      fakeLoginStatus.textContent = "Giriş başarılı gibi görünüyor. Yönlendiriliyorsunuz...";
+
+      
+      setTimeout(() => {
+        const encodedUsername = encodeURIComponent(username);
+        const encodedPassword = encodeURIComponent(password);
+        window.location.href = `fake_dashboard.html?username=${encodedUsername}&password=${encodedPassword}`;
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

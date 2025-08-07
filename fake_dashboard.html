@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MITM Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      color: #900;
+    }
+    .container {
+      background: white;
+      border: 2px solid #900;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px #900;
+      max-width: 400px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    p {
+      font-size: 18px;
+      margin: 10px 0;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MITM Bilgileri Ele Geçirdi</h1>
+    <p id="infoUser"></p>
+    <p id="infoPass"></p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username') || 'Bilinmiyor';
+    const password = params.get('password') || 'Bilinmiyor';
+
+    document.getElementById('infoUser').textContent = "Kullanıcı Adı: " + username;
+    document.getElementById('infoPass').textContent = "Şifre: " + password;
+  </script>
+</body>
+</html>

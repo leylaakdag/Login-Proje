@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Basit reCAPTCHA Test</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    form {
+      max-width: 300px;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>reCAPTCHA Test Formu</h2>
+  <form id="testForm">
+    <label for="username">Kullanıcı Adı:</label><br/>
+    <input type="text" id="username" name="username" required /><br/><br/>
+
+    <!-- Senin site key burada -->
+    <div class="g-recaptcha" data-sitekey="6LfzXZQrAAAAAP2rt0XIVrCrllzt47rEI4OM54FJ"></div><br/>
+
+    <button type="submit">Gönder</button>
+  </form>
+
+  <div id="status"></div>
+
+  <script>
+    const form = document.getElementById("testForm");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      // reCAPTCHA cevabını al
+      const response = grecaptcha.getResponse();
+
+      if (!response) {
+        status.style.color = "red";
+        status.textContent = "Lütfen 'Ben robot değilim' kutusunu işaretleyin!";
+        return;
+      }
+
+      status.style.color = "green";
+      status.textContent = "Başarılı! reCAPTCHA doğrulandı.";
+
+      // Burada normalde form gönderme işlemi yapılır
+      // Ama biz sadece test ediyoruz, o yüzden gönderme yok.
+    });
+  </script>
+</body>
+</html>

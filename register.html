@@ -1,0 +1,234 @@
+<!DOCTYPE html> 
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kayıt Ol</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .register-container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #555;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+    #generatePasswordBtn {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #generatePasswordBtn:hover {
+      background-color: #0056b3;
+    }
+    .checkbox-group {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button[type="submit"] {
+      width: 100%;
+      margin-top: 25px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button[type="submit"]:hover {
+      background-color: #1e7e34;
+    }
+    p.message {
+      font-size: 14px;
+      margin: 5px 0 0 0;
+    }
+    #passwordStrength {
+      font-weight: bold;
+    }
+    #confirmPasswordMessage {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-container">
+    <h2>Kayıt Ol</h2>
+    <form id="registerForm" autocomplete="off">
+      <label for="username">Kullanıcı Adı</label>
+      <input type="text" id="username" required />
+
+      <label for="password">Şifre</label>
+      <input type="password" id="password" required />
+      <p id="passwordStrength" class="message"></p>
+
+      <label for="confirmPassword">Şifre Tekrar</label>
+      <input type="password" id="confirmPassword" required />
+      <p id="confirmPasswordMessage" class="message"></p>
+
+      <button type="button" id="generatePasswordBtn" title="Güçlü şifre öner">Şifre Öner</button>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="showPasswordRegister" />
+        <label for="showPasswordRegister">Şifreyi Göster</label>
+      </div>
+
+      <button type="submit">Kaydol</button>
+      <p id="registerMessage" class="message"></p>
+    </form>
+  </div>
+
+<script>
+ 
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+
+  document.getElementById('showPasswordRegister').addEventListener('change', function() {
+    const pwd = document.getElementById('password');
+    const pwdConfirm = document.getElementById('confirmPassword');
+    const type = this.checked ? 'text' : 'password';
+    pwd.type = type;
+    pwdConfirm.type = type;
+  });
+
+  document.getElementById('generatePasswordBtn').addEventListener('click', function() {
+    const newPwd = generatePassword(12);
+    document.getElementById('password').value = newPwd;
+    document.getElementById('confirmPassword').value = newPwd;
+    checkPasswordStrength(newPwd);
+    document.getElementById('confirmPasswordMessage').textContent = '';
+  });
+
+  document.getElementById('password').addEventListener('input', function() {
+    checkPasswordStrength(this.value);
+  });
+
+  document.getElementById('confirmPassword').addEventListener('input', function() {
+    const pwd = document.getElementById('password').value;
+    const confirmPwd = this.value;
+    const msgElem = document.getElementById('confirmPasswordMessage');
+
+    if (confirmPwd !== pwd) {
+      msgElem.textContent = 'Şifreler eşleşmiyor.';
+    } else {
+      msgElem.textContent = '';
+    }
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const registerMessage = document.getElementById('registerMessage');
+
+    if (username === '') {
+      registerMessage.textContent = 'Kullanıcı adı boş bırakılamaz.';
+      registerMessage.style.color = 'red';
+      return;
+    }
+
+    if(localStorage.getItem(username)) {
+      registerMessage.textContent = 'Bu kullanıcı adı zaten kayıtlı. Lütfen başka bir kullanıcı adı deneyin.';
+      registerMessage.style.color = 'red';
+      return;
+    }
+
+    if(password !== confirmPassword) {
+      registerMessage.textContent = 'Şifreler eşleşmiyor.';
+      registerMessage.style.color = 'red';
+      return;
+    }
+
+    const simplePasswords = ["123456", "password", "admin", "qwerty", "111111", "abc123"];
+    if(simplePasswords.includes(password)) {
+      registerMessage.textContent = "Bu şifre çok basit, lütfen daha karmaşık bir şifre seçin.";
+      registerMessage.style.color = "red";
+      return;
+    }
+
+    const hashedPassword = await sha256(password);
+
+    const userData = { username: username, password: hashedPassword };
+    localStorage.setItem(username, JSON.stringify(userData));
+
+    registerMessage.textContent = 'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...';
+    registerMessage.style.color = 'green';
+
+    setTimeout(() => {
+      window.location.href = 'index.html'; 
+    }, 2000);
+  });
+
+  function generatePassword(length = 12) {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+    let pwd = "";
+    for(let i=0; i<length; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return pwd;
+  }
+
+  function checkPasswordStrength(pwd) {
+    const strengthElem = document.getElementById('passwordStrength');
+    let strength = 0;
+    if(pwd.length >= 8) strength++;
+    if(/[A-Z]/.test(pwd)) strength++;
+    if(/[a-z]/.test(pwd)) strength++;
+    if(/[0-9]/.test(pwd)) strength++;
+    if(/[\W]/.test(pwd)) strength++;
+
+    const levels = ["Çok Zayıf", "Zayıf", "Orta", "İyi", "Çok İyi"];
+    strengthElem.textContent = "Şifre Gücü: " + (levels[strength - 1] || "");
+    strengthElem.style.color = ["#d9534f", "#f0ad4e", "#f0ad4e", "#5cb85c", "#4cae4c"][strength - 1] || "#000";
+  }
+</script>
+
+</body>
+</html>

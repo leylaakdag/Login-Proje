@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Şifremi Unuttum</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+</head>
+<body>
+  <div class="login-container">
+    <h2>Şifremi Unuttum</h2>
+    <form id="forgotForm">
+      <input type="text" id="username" placeholder="Kullanıcı adınızı girin" required>
+      <input type="password" id="newPassword" placeholder="Yeni şifrenizi girin" required>
+      <div class="checkbox-group" style="margin-top: 5px;">
+        <input type="checkbox" id="showNewPassword" />
+        <label for="showNewPassword">Şifreyi Göster</label>
+      </div>
+      <button type="submit">Şifreyi Güncelle</button>
+    </form>
+    <button id="goLoginBtn" style="display:none; margin-top: 10px;">Giriş Yap</button>
+    <p id="resetMessage" style="margin-top:10px;"></p>
+    <p style="margin-top:20px;"><a href="index.html">Giriş sayfasına dön</a></p>
+  </div>
+
+  <script>
+    document.getElementById('forgotForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+      const resetMessage = document.getElementById('resetMessage');
+      const goLoginBtn = document.getElementById('goLoginBtn');
+
+      const userData = JSON.parse(localStorage.getItem(username));
+
+      if (!userData) {
+        resetMessage.textContent = 'Kullanıcı bulunamadı.';
+        resetMessage.style.color = 'red';
+        return;
+      }
+
+      userData.password = newPassword;
+      localStorage.setItem(username, JSON.stringify(userData));
+
+      resetMessage.textContent = 'Şifre başarıyla güncellendi.';
+      resetMessage.style.color = 'green';
+      goLoginBtn.style.display = 'inline-block';
+    });
+
+    document.getElementById('goLoginBtn').addEventListener('click', function () {
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('showNewPassword').addEventListener('change', function () {
+      const passwordField = document.getElementById('newPassword');
+      passwordField.type = this.checked ? 'text' : 'password';
+    });
+  </script>
+</body>
+</html>
